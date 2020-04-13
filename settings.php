@@ -4,10 +4,7 @@ function loadSettings()
     $settingsFilename = dirname(__FILE__) . "/settings.json";
     $settings = json_decode(file_get_contents($settingsFilename), true);
     if($settings === NULL)
-    {
-        error_log("Failed to load " . $settingsFilename);
-        die();
-    }
+        die("Failed to load " . $settingsFilename);
 
     return $settings;
 }
@@ -17,11 +14,20 @@ function database()
     $settings = loadSettings();
 
     if(!array_key_exists("db", $settings))
-        die();
+        die("Settings does not have db key");
 
     if(array_key_exists("dbUsername", $settings) && array_key_exists("dbPassword", $settings))
         return new PDO($settings["db"], $settings["dbUsername"], $settings["dbPassword"]);
 
-    return new PDO($settings["db"]);
+    try
+    {
+        $db = new PDO($settings["db"]);
+    }
+    catch(PDOException $e)
+    {
+        die("PDOException: " . $e->getMessage());
+    }
+
+    return $db;
 }
 ?>
