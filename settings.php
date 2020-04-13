@@ -16,12 +16,21 @@ function database()
     if(!array_key_exists("db", $settings))
         die("Settings does not have db key");
 
-    if(array_key_exists("dbUsername", $settings) && array_key_exists("dbPassword", $settings))
-        return new PDO($settings["db"], $settings["dbUsername"], $settings["dbPassword"]);
-
     try
     {
-        $db = new PDO($settings["db"]);
+        if(array_key_exists("dbUsername", $settings) && array_key_exists("dbPassword", $settings))
+            $db = new PDO($settings["db"], $settings["dbUsername"], $settings["dbPassword"]);
+        else
+            $db = new PDO($settings["db"]);
+
+        $db->exec("CREATE TABLE IF NOT EXISTS log (
+            ip TEXT,
+            email TEXT,
+            locale TEXT,
+            product TEXT,
+            version TEXT,
+            os TEXT,
+            time INTEGER)");
     }
     catch(PDOException $e)
     {

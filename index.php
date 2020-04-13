@@ -8,16 +8,6 @@ function logEvent($ip, $email, $locale, $product, $version, $os, $time)
         $db = database();
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        #$db->exec("DROP TABLE log");
-        $db->exec("CREATE TABLE IF NOT EXISTS log (
-            ip TEXT,
-            email TEXT,
-            locale TEXT,
-            product TEXT,
-            version TEXT,
-            os TEXT,
-            time INTEGER)");
-
         $insert = "INSERT INTO log
             (ip, email, locale, product, version, os, time)
             VALUES(:ip, :email, :locale, :product, :version, :os, :time)";
@@ -34,11 +24,8 @@ function logEvent($ip, $email, $locale, $product, $version, $os, $time)
     }
     catch(Exception $e)
     {
-        error_log($e);
-        return false;
+        die($e);
     }
-
-    return true;
 }
 
 $reply = array("error" => "none", "content" => "");
