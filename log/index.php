@@ -34,7 +34,7 @@ try
     $skipDomainQueryFragment .= "email NOT LIKE '%$skipDomain'";
   }
 
-  $db = new PDO(database());
+  $db = database();
   $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
   $select = "SELECT time FROM log WHERE $skipDomainQueryFragment ORDER BY time ASC LIMIT 1";

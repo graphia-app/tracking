@@ -5,7 +5,7 @@ function logEvent($ip, $email, $locale, $product, $version, $os, $time)
 {
     try
     {
-        $db = new PDO(database());
+        $db = database();
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         #$db->exec("DROP TABLE log");

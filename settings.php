@@ -16,9 +16,12 @@ function database()
 {
     $settings = loadSettings();
 
-    if(!array_key_exists("database", $settings))
+    if(!array_key_exists("db", $settings))
         die();
 
-    return $settings["database"];
+    if(array_key_exists("dbUsername", $settings) && array_key_exists("dbPassword", $settings))
+        return new PDO($settings["db"], $settings["dbUsername"], $settings["dbPassword"]);
+
+    return new PDO($settings["db"]);
 }
 ?>
