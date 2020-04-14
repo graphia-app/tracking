@@ -195,12 +195,7 @@ function summariseList($list, $outputFunction)
     }
 }
 
-function googleLuckyLink($text)
-{
-    return "<a href=\"https://www.google.com/search?q=$text&btnI\">$text</a>";
-}
-
-function mailToLink($email, $product)
+function emailVerified($email)
 {
     $db = $GLOBALS["db"];
     $select = "SELECT COUNT(address) FROM emails WHERE address = '$email' AND verified = 1";
@@ -210,7 +205,17 @@ function mailToLink($email, $product)
 
     $verified = $row['COUNT(address)'] > 0;
 
-    if(!$verified)
+    return $verified;
+}
+
+function googleLuckyLink($text)
+{
+    return "<a href=\"https://www.google.com/search?q=$text&btnI\">$text</a>";
+}
+
+function mailToLink($email, $product)
+{
+    if(!emailVerified($email))
         return $email;
 
     $htmlProduct = rawurlencode($product);
@@ -314,13 +319,16 @@ try
             $domain = substr(strrchr($email, "@"), 1);
             $time = $emailRow['time'];
 
-            if(!array_key_exists($domain, $domainCounts))
-                $domainCounts[$domain] = 0;
+            if(emailVerified($email))
+            {
+                if(!array_key_exists($domain, $domainCounts))
+                    $domainCounts[$domain] = 0;
 
-            $domainCounts[$domain]++;
+                $domainCounts[$domain]++;
 
-            if(!in_array($domain, $recentDomains))
-                array_push($recentDomains, $domain);
+                if(!in_array($domain, $recentDomains))
+                    array_push($recentDomains, $domain);
+            }
 
             if(!array_key_exists($product, $emailCounts))
                 $emailCounts[$product] = array();
