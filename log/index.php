@@ -200,9 +200,21 @@ function googleLuckyLink($text)
   return "<a href=\"https://www.google.com/search?q=$text&btnI\">$text</a>";
 }
 
-function mailToLink($text)
+function mailToLink($email, $product)
 {
-  return "<a href=\"mailto:$text\">$text</a> ";
+  $db = $GLOBALS["db"];
+  $select = "SELECT COUNT(address) FROM emails WHERE address = '$email' AND verified = 1";
+  $statement = $db->prepare($select);
+  $statement->execute();
+  $row = $statement->fetch(PDO::FETCH_ASSOC);
+
+  $verified = $row['COUNT(address)'] > 0;
+
+  if(!$verified)
+      return $email;
+
+  $htmlProduct = rawurlencode($product);
+  return "<a href=\"mailto:$email?subject=$htmlProduct\">$email</a>";
 }
 
 function secondsToSpan($seconds)
@@ -369,14 +381,14 @@ try
     echo "<td>";
     echo "<strong>Recent</strong>:<br>";
     foreach(array_slice($recentEmails, 0, 10) as $element)
-      echo mailToLink($element) . "<br>";
+      echo mailToLink($element, $product) . "<br>";
     echo "</td>";
 
     echo "<td>";
     echo "<strong>Overall</strong>:<br>";
     summariseList($emailCounts[$product], function($element, $percent)
     {
-      echo mailToLink($element) . " ($percent%)<br>";
+      echo mailToLink($element, $product) . " ($percent%)<br>";
     });
     echo "</td>";
     echo "</tr>";
@@ -417,11 +429,9 @@ try
       $time = $row['time'];
       $count = $emailCounts[$product][$email];
 
-      $htmlProduct = rawurlencode($product);
-
       echo "<tr>";
 
-      echo "<td><a href=\"mailto:$email?subject=$htmlProduct\">$email</a></td>";
+      echo "<td>" . mailToLink($email, $product) . "</td>";
 
       if($count >= 15)
         echo "<td class=\"highlight1\">";
