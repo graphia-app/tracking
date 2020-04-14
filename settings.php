@@ -31,6 +31,11 @@ function database()
             version TEXT,
             os TEXT,
             time INTEGER)");
+
+        $db->exec("CREATE TABLE IF NOT EXISTS emails (
+            address TEXT,
+            code TEXT,
+            verified INTEGER DEFAULT 0)");
     }
     catch(PDOException $e)
     {
