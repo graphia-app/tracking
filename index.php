@@ -1,6 +1,14 @@
 <?php
 require_once("settings.php");
 
+function baseUrl()
+{
+    return sprintf("%s://%s",
+        isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http',
+        $_SERVER['SERVER_NAME']
+    );
+}
+
 function verifyEmail($email)
 {
     if(preg_match("/^anon_[a-f0-9]{7}@.*$/", $email) === 1)
@@ -38,7 +46,7 @@ function verifyEmail($email)
         $headers .= "Content-type: text/html; charset=utf8\r\n";
         $headers .= "From: Graphia <info@graphia.app>\r\n";
 
-        $link = "https://tracking.graphia.app/verifyemail.php?email=$email&code=$code";
+        $link = baseUrl() . "/verifyemail.php?email=$email&code=$code";
         $body = file_get_contents("email/template.html");
         $body = str_replace("__VERIFY_LINK__", $link, $body);
 
