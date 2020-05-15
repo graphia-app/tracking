@@ -50,7 +50,7 @@ function verifyEmail($email)
         $body = file_get_contents("email/template.html");
         $body = str_replace("__VERIFY_LINK__", $link, $body);
 
-        mail($email, $subject, $body, $headers);
+        mail($email, $subject, $body, $headers, "-f info@graphia.app");
     }
     catch(Exception $e)
     {
