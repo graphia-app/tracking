@@ -42,15 +42,18 @@ function verifyEmail($email)
 
         // Send them an email to verify it's a real address
         $subject = "Email Verification";
-        $headers .= "MIME-Version: 1.0\r\n";
+        $headers = "MIME-Version: 1.0\r\n";
         $headers .= "Content-type: text/html; charset=utf8\r\n";
         $headers .= "From: Graphia <info@graphia.app>\r\n";
+        $headers .= "Reply-To: Graphia <info@graphia.app>\r\n";
+        $headers .= 'X-Mailer: PHP/' . phpversion();
 
         $link = baseUrl() . "/verifyemail.php?email=$email&code=$code";
         $body = file_get_contents("email/template.html");
         $body = str_replace("__VERIFY_LINK__", $link, $body);
+        $body = wordwrap($body);
 
-        mail($email, $subject, $body, $headers, "-f info@graphia.app");
+        mail($email, $subject, $body, $headers);
     }
     catch(Exception $e)
     {
