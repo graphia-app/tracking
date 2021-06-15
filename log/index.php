@@ -165,7 +165,7 @@ function lookupIp(ip, ipClass)
 
 function summariseList($list, $outputFunction)
 {
-    $maxElements = 9;
+    $maxElements = 4;
     $otherPercent = 0.0;
     $numElements = 0;
 
@@ -374,7 +374,7 @@ try
 
         echo "<td>";
         echo "<strong>Recent</strong>:<br>";
-        foreach(array_slice($recentDomains, 0, 10) as $element)
+        foreach(array_slice($recentDomains, 0, 5) as $element)
             echo googleLuckyLink($element) . "<br>";
         echo "</td>";
 
@@ -388,7 +388,7 @@ try
 
         echo "<td>";
         echo "<strong>Recent</strong>:<br>";
-        foreach(array_slice($recentEmails, 0, 10) as $element)
+        foreach(array_slice($recentEmails, 0, 5) as $element)
             echo mailToLink($element, $product) . "<br>";
         echo "</td>";
 
