@@ -405,6 +405,103 @@ try
 </table>
 
 <table class="table">
+<?php
+        $select = "SELECT version, os FROM log " .
+            "WHERE time BETWEEN $fromTime AND $toTime " .
+            "AND product = '$product'" .
+            "AND $skipDomainQueryFragment";
+        $versionStatement = $db->prepare($select);
+        $versionStatement->execute();
+
+        $productVersions = array();
+        $totalVersions = 0;
+
+        while($row = $versionStatement->fetch(PDO::FETCH_ASSOC))
+        {
+            $productVersionNumber = $row['version'];
+            $osDetail = explode(" ", $row['os']);
+
+            $productVersion = &$productVersions[$productVersionNumber];
+            $productVersion['count']++;
+            $totalVersions++;
+
+            $os = &$productVersion['oses'][$osDetail[0]];
+            $os['count']++;
+
+            $versionString = $osDetail[3] . ' (' . $osDetail[1] . ')';
+            if($osDetail[0] === 'linux')
+                $versionString = $osDetail[2] . ' ' . $versionString;
+
+            $os['versions'][$versionString]++;
+        }
+
+        function sortByCount($a, $b)
+        {
+            if(!is_array($a) && is_array($b))
+                return -1;
+
+            if(!is_array($b) && is_array($a))
+                return 1;
+
+            if($a['count'] === $b['count'])
+                return 0;
+
+            return ($a['count'] > $b['count']) ? -1 : 1;
+        }
+
+        uasort($productVersions, 'sortByCount');
+        foreach($productVersions as &$os)
+        {
+            uasort($os['oses'], 'sortByCount');
+            foreach($os['oses'] as &$osData)
+                arsort($osData['versions']);
+        }
+
+        $productVersions = array_filter($productVersions, function($data) use ($totalVersions)
+        {
+            $percentage = ($data['count'] * 100) / $totalVersions;
+            return $percentage > 1.0;
+        });
+
+        echo "<tr>\n";
+        foreach($productVersions as $productVersionNumber => $data)
+        {
+            $versionPercentage = round(($data['count'] * 100) / $totalVersions);
+            echo "<th>$productVersionNumber ($versionPercentage%)</th>\n";
+        }
+        echo "</tr>\n";
+
+        echo "<tr>\n";
+        foreach($productVersions as $productVersionNumber => $data)
+        {
+            echo "<td>\n";
+            foreach($data['oses'] as $os => $osData)
+            {
+                $osVersionDetail = "";
+                foreach($osData['versions'] as $osVersion => $osVersionCount)
+                {
+                    $osVersionPercentage = round(($osVersionCount * 100) / $osData['count']);
+
+                    if($osVersionPercentage === 0.0)
+                        $osVersionPercentage = '<1';
+
+                    if(strlen($osVersionDetail) !== 0)
+                        $osVersionDetail .= "\n";
+
+                    $osVersionDetail .= "$osVersion ($osVersionPercentage%)";
+                }
+
+                $osPercentage = round(($osData['count'] * 100) / $data['count']);
+                echo "<div data-toggle='tooltip' title='$osVersionDetail'>$os ($osPercentage%)</div>\n";
+            }
+            echo "</td>\n";
+        }
+        echo "</tr>\n";
+?>
+
+</table>
+
+<table class="table">
 <tr>
 <th>Email Address</th>
 <th>Count</th>
