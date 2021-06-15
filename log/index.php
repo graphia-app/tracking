@@ -502,6 +502,48 @@ try
 </table>
 
 <table class="table">
+<?php
+        $select = "SELECT locale, COUNT(locale) FROM log " .
+            "WHERE time BETWEEN $fromTime AND $toTime " .
+            "AND product = '$product'" .
+            "AND $skipDomainQueryFragment " .
+            "GROUP BY locale";
+        $localeStatement = $db->prepare($select);
+        $localeStatement->execute();
+
+        $locales = array();
+        while($row = $localeStatement->fetch(PDO::FETCH_ASSOC))
+            $locales[$row['locale']] = intval($row['COUNT(locale)']);
+
+        arsort($locales);
+
+        $totalRows = array_sum($locales);
+        $locales = array_filter($locales, function($count) use ($totalRows)
+        {
+            $percentage = ($count * 100) / $totalRows;
+            return $percentage > 1.0;
+        });
+
+        $totalRows = array_sum($locales);
+
+        echo "<tr>\n";
+        foreach(array_keys($locales) as $locale)
+            echo "<th>$locale</th>";
+        echo "</tr>\n";
+
+        echo "<tr>\n";
+        foreach($locales as $locale => $count)
+        {
+            $percent = ($count * 100) / $totalRows;
+            $roundedPercent = round($percent);
+
+            echo "<td>$roundedPercent%</td>";
+        }
+        echo "</tr>\n";
+?>
+</table>
+
+<table class="table">
 <tr>
 <th>Email Address</th>
 <th>Count</th>
