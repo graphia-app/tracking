@@ -266,6 +266,14 @@ function epochTimeToHumanReadable($time)
     return $dt->format('H:i d-m-Y');
 }
 
+function incrementArrayByIndex(&$a, $i)
+{
+    if(!array_key_exists($i, $a))
+        $a[$i] = 0;
+
+    $a[$i]++;
+}
+
 try
 {
     $select = "SELECT product, COUNT(product) FROM log " .
@@ -321,10 +329,7 @@ try
 
             if(emailVerified($email))
             {
-                if(!array_key_exists($domain, $domainCounts))
-                    $domainCounts[$domain] = 0;
-
-                $domainCounts[$domain]++;
+                incrementArrayByIndex($domainCounts, $domain);
 
                 if(!in_array($domain, $recentDomains))
                     array_push($recentDomains, $domain);
@@ -421,18 +426,30 @@ try
             $productVersionNumber = $row['version'];
             $osDetail = explode(" ", $row['os']);
 
+            if(!array_key_exists($productVersionNumber, $productVersions))
+                $productVersions[$productVersionNumber] = array();
+
             $productVersion = &$productVersions[$productVersionNumber];
-            $productVersion['count']++;
+            incrementArrayByIndex($productVersion, 'count');
             $totalVersions++;
 
+            if(!array_key_exists('oses', $productVersion))
+                $productVersion['oses'] = array();
+
+            if(!array_key_exists($osDetail[0], $productVersion['oses']))
+                $productVersion['oses'][$osDetail[0]] = array();
+
             $os = &$productVersion['oses'][$osDetail[0]];
-            $os['count']++;
+            incrementArrayByIndex($os, 'count');
 
             $versionString = $osDetail[3] . ' (' . $osDetail[1] . ')';
             if($osDetail[0] === 'linux')
                 $versionString = $osDetail[2] . ' ' . $versionString;
 
-            $os['versions'][$versionString]++;
+            if(!array_key_exists('versions', $os))
+                $os['versions'] = array();
+
+            incrementArrayByIndex($os['versions'], $versionString);
         }
 
         function sortByCount($a, $b)
