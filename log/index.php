@@ -399,7 +399,7 @@ try
 
         echo "<td>";
         echo "<strong>Overall</strong>:<br>";
-        summariseList($emailCounts[$product], function($element, $percent)
+        summariseList($emailCounts[$product], function($element, $percent) use ($product)
         {
             echo mailToLink($element, $product) . " ($percent%)<br>";
         });
