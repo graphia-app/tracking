@@ -489,10 +489,10 @@ try
         echo "</tr>\n";
 
         echo "<tr>\n";
-        foreach($productVersions as $productVersionNumber => $data)
+        foreach($productVersions as $data)
         {
             echo "<td>\n";
-            foreach($data['oses'] as $os => $osData)
+            foreach($data['oses'] as $osName => $osData)
             {
                 $osVersionDetail = "";
                 foreach($osData['versions'] as $osVersion => $osVersionCount)
@@ -509,7 +509,7 @@ try
                 }
 
                 $osPercentage = round(($osData['count'] * 100) / $data['count']);
-                echo "<div data-toggle='tooltip' title='$osVersionDetail'>$os ($osPercentage%)</div>\n";
+                echo "<div data-toggle='tooltip' title='$osVersionDetail'>$osName ($osPercentage%)</div>\n";
             }
             echo "</td>\n";
         }
