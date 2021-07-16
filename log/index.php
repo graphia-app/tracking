@@ -442,7 +442,7 @@ try
             $os = &$productVersion['oses'][$osDetail[0]];
             incrementArrayByIndex($os, 'count');
 
-            $versionString = $osDetail[3] . ' (' . $osDetail[1] . ')';
+            $versionString = $osDetail[3];
             if($osDetail[0] === 'linux')
                 $versionString = $osDetail[2] . ' ' . $versionString;
 
