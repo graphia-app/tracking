@@ -25,7 +25,7 @@ try
         $skipDomainsText = "";
 
     // Always true, so that if no domains are added, the fragment is still valid
-    $skipDomainQueryFragment = "1";
+    $skipDomainQueryFragment = "1 ";
     foreach($skipDomains as $skipDomain)
     {
         if(strlen($skipDomainQueryFragment) !== 0)
@@ -34,10 +34,18 @@ try
         $skipDomainQueryFragment .= "email NOT LIKE '%$skipDomain'";
     }
 
+    if(array_key_exists("version", $_GET))
+    {
+        $version = $_GET["version"];
+        $versionFilterFragment = "version LIKE '%$version%'";
+    }
+    else
+        $versionFilterFragment = "1";
+
     $db = database();
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    $select = "SELECT time FROM log WHERE $skipDomainQueryFragment ORDER BY time ASC LIMIT 1";
+    $select = "SELECT time FROM log WHERE $skipDomainQueryFragment AND $versionFilterFragment ORDER BY time ASC LIMIT 1";
     $statement = $db->prepare($select);
     $statement->execute();
     $row = $statement->fetch(PDO::FETCH_ASSOC);
@@ -93,6 +101,7 @@ try
     $select = "SELECT product, COUNT(product) FROM log " .
         "WHERE time BETWEEN $fromTime AND $toTime " .
         "AND $skipDomainQueryFragment " .
+        "AND $versionFilterFragment " .
         "GROUP BY product " .
         "ORDER BY COUNT(product) DESC";
     $productStatement = $db->prepare($select);
@@ -279,6 +288,7 @@ try
     $select = "SELECT product, COUNT(product) FROM log " .
         "WHERE time BETWEEN $fromTime AND $toTime " .
         "AND $skipDomainQueryFragment " .
+        "AND $versionFilterFragment " .
         "GROUP BY product " .
         "ORDER BY COUNT(product) DESC";
     $productStatement = $db->prepare($select);
@@ -310,6 +320,7 @@ try
         $select = "SELECT email, lower(email), time FROM log " .
             "WHERE time BETWEEN $fromTime AND $toTime " .
             "AND $skipDomainQueryFragment " .
+            "AND $versionFilterFragment " .
             "AND product = \"$product\" " .
             "ORDER BY time DESC";
         $emailStatement = $db->prepare($select);
@@ -414,7 +425,8 @@ try
         $select = "SELECT version, os FROM log " .
             "WHERE time BETWEEN $fromTime AND $toTime " .
             "AND product = '$product'" .
-            "AND $skipDomainQueryFragment";
+            "AND $skipDomainQueryFragment" .
+            "AND $versionFilterFragment ";
         $versionStatement = $db->prepare($select);
         $versionStatement->execute();
 
@@ -484,7 +496,7 @@ try
         foreach($productVersions as $productVersionNumber => $data)
         {
             $versionPercentage = round(($data['count'] * 100) / $totalVersions);
-            echo "<th>$productVersionNumber ($versionPercentage%)</th>\n";
+            echo "<th><a href=\"?version=$productVersionNumber\">$productVersionNumber</a> ($versionPercentage%)</th>\n";
         }
         echo "</tr>\n";
 
@@ -524,6 +536,7 @@ try
             "WHERE time BETWEEN $fromTime AND $toTime " .
             "AND product = '$product'" .
             "AND $skipDomainQueryFragment " .
+            "AND $versionFilterFragment " .
             "GROUP BY locale";
         $localeStatement = $db->prepare($select);
         $localeStatement->execute();
@@ -577,6 +590,7 @@ try
             "WHERE time BETWEEN $fromTime AND $toTime " .
             "AND product = '$product'" .
             "AND $skipDomainQueryFragment " .
+            "AND $versionFilterFragment " .
             "ORDER BY time DESC";
         $statement = $db->prepare($select);
         $statement->execute();
