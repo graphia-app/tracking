@@ -611,12 +611,13 @@ try
 </tr>
 
 <?php
-        $select = "SELECT ip, email, lower(email), locale, version, os, time FROM log " .
+        $select = "SELECT ip, email, lower(email), locale, version, os, time, max(time) FROM log " .
             "WHERE time BETWEEN $fromTime AND $toTime " .
             "AND product = '$product'" .
             "AND $skipDomainQueryFragment " .
             "AND $versionFilterFragment " .
-            "ORDER BY time DESC";
+            "GROUP BY email " .
+            "ORDER BY max(time) DESC";
         $statement = $db->prepare($select);
         $statement->execute();
 
