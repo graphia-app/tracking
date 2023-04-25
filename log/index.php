@@ -375,13 +375,17 @@ try
             if(!array_key_exists($email, $emailSpans[$product]))
             {
                 $emailSpans[$product][$email] = array(
+                    "original" => $time,
                     "first" => $time,
                     "last" => $time
                 );
             }
 
             if($time < $emailSpans[$product][$email]["first"])
+            {
+                $emailSpans[$product][$email]["original"] = $time;
                 $emailSpans[$product][$email]["first"] = $time;
+            }
 
             if($time > $emailSpans[$product][$email]["last"])
                 $emailSpans[$product][$email]["last"] = $time;
@@ -392,10 +396,19 @@ try
         $numUsers = sizeof($emailCounts[$product]);
         $countPerUser = round($count / $numUsers, 1);
 
-        $totalSpan = 0;
-        foreach($emailSpans[$product] as $element)
-            $totalSpan += ($element["last"] - $element["first"]);
-        $spanPerUser = secondsToSpan(round($totalSpan / $numUsers));
+        $select = "SELECT email, lower(email), min(time) FROM log " .
+            "WHERE $skipDomainQueryFragment " .
+            "AND $versionFilterFragment " .
+            "AND product = \"$product\" " .
+            "GROUP BY email";
+        $emailStatement = $db->prepare($select);
+        $emailStatement->execute();
+        while($emailRow = $emailStatement->fetch(PDO::FETCH_ASSOC))
+        {
+            $email = $emailRow['lower(email)'];
+            $time = $emailRow['min(time)'];
+            $emailSpans[$product][$email]["original"] = $time;
+        }
 
         echo "<td>$numUsers</td>";
         echo "<td>$countPerUser</td>";
@@ -635,7 +648,7 @@ try
             echo "$count</td>";
 
             $secondsSpan = $emailSpans[$product][$email]["last"] -
-                $emailSpans[$product][$email]["first"];
+                $emailSpans[$product][$email]["original"];
             $span = secondsToSpan($secondsSpan);
             echo "<td>$span</td>";
 
