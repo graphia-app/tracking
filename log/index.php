@@ -231,6 +231,12 @@ function mailToLink($email, $product)
     return "<a href=\"mailto:$email?subject=$htmlProduct\">$email</a>";
 }
 
+$minuteInSecs = 60;
+$hourInSecs = $minuteInSecs * 60;
+$dayInSecs = $hourInSecs * 24;
+$monthInSecs = $dayInSecs * 31;
+$yearInSecs = $dayInSecs * 365;
+
 function secondsToSpan($seconds)
 {
     if($seconds === 0)
@@ -240,14 +246,20 @@ function secondsToSpan($seconds)
     $dtT = new DateTime("@$seconds");
     $span = $dtF->diff($dtT);
 
-    if($seconds < 60)
-        return $span->format('%ss');
-    else if($seconds < 3600)
-        return $span->format('%im');
-    else if($seconds < 86400)
-        return $span->format('%hh');
+    global $minuteInSecs, $hourInSecs, $dayInSecs, $monthInSecs, $yearInSecs;
 
-    return $span->format('%ad');
+    if($seconds < $minuteInSecs)
+        return $span->format('%s seconds');
+    else if($seconds < $hourInSecs)
+        return $span->format('%i minutes');
+    else if($seconds < $dayInSecs)
+        return $span->format('%h hours');
+    else if($seconds < $monthInSecs)
+        return $span->format('%a days');
+    else if($seconds < $yearInSecs)
+        return $span->format('%m months %d days');
+
+    return $span->format('%y years %m months');
 }
 
 function epochTimeToHumanReadable($time)
