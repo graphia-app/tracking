@@ -601,12 +601,12 @@ try
 <table class="table">
 <tr>
 <th>Email Address</th>
-<th>Count</th>
-<th>Span</th>
-<th>Per Day</th>
+<th>Uses in Date Range</th>
+<th>Time Since First Use</th>
+<th>Overall Uses Per Month</th>
 <th>Locale</th>
 <th>Version</th>
-<th>Time and Date</th>
+<th>Last Used</th>
 <th>IP Address</th>
 </tr>
 
@@ -637,11 +637,11 @@ try
 
             echo "<td>" . mailToLink($email, $product) . "</td>";
 
-            if($count >= 15)
+            if($count >= 20)
                 echo "<td class=\"highlight1\">";
-            else if($count >= 10)
+            else if($count >= 15)
                 echo "<td class=\"highlight2\">";
-            else if($count >= 5)
+            else if($count >= 10)
                 echo "<td class=\"highlight3\">";
             else
                 echo "<td>";
@@ -651,18 +651,37 @@ try
             $secondsSpan = $emailSpans[$product][$email]["last"] -
                 $emailSpans[$product][$email]["original"];
             $span = secondsToSpan($secondsSpan);
-            echo "<td>$span</td>";
 
-            $daysSpan = $secondsSpan / 86400;
-            if($daysSpan > 1)
+            if($secondsSpan >= $yearInSecs)
+                echo "<td class=\"highlight1\">";
+            else if($secondsSpan >= ($monthInSecs * 6))
+                echo "<td class=\"highlight2\">";
+            else if($secondsSpan >= $monthInSecs)
+                echo "<td class=\"highlight3\">";
+            else
+                echo "<td>";
+
+            echo "$span</td>";
+
+            $monthsSpan = $secondsSpan / $monthInSecs;
+            if($monthsSpan > 1)
             {
-                $daysSpan = max($daysSpan, 1);
-                $usesPerDay = round($count / $daysSpan, 1);
+                $monthsSpan = max($monthsSpan, 1);
+                $usesPerMonth = round($count / $monthsSpan, 1);
             }
             else
-                $usesPerDay = "";
+                $usesPerMonth = "";
 
-            echo "<td>$usesPerDay</td>";
+            if($usesPerMonth >= 5)
+                echo "<td class=\"highlight1\">";
+            else if($usesPerMonth >= 1)
+                echo "<td class=\"highlight2\">";
+            else if($usesPerMonth >= 0.3)
+                echo "<td class=\"highlight3\">";
+            else
+                echo "<td>";
+
+            echo "$usesPerMonth</td>";
 
             echo "<td>$locale</td>";
 
