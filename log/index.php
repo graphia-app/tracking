@@ -520,7 +520,7 @@ try
         echo "<tr>\n";
         foreach($productVersions as $productVersionNumber => $data)
         {
-            $versionPercentage = round(($data['count'] * 100) / $totalVersions);
+            $versionPercentage = round(($data['count'] * 100) / $totalVersions, 1);
             echo "<th><a href=\"?version=$productVersionNumber\">$productVersionNumber</a> ($versionPercentage%)</th>\n";
         }
         echo "</tr>\n";
@@ -667,7 +667,7 @@ try
             if($monthsSpan > 1)
             {
                 $monthsSpan = max($monthsSpan, 1);
-                $usesPerMonth = round($count / $monthsSpan, 1);
+                $usesPerMonth = round($count / $monthsSpan, 2);
             }
             else
                 $usesPerMonth = "";
