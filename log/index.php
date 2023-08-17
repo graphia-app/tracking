@@ -529,12 +529,12 @@ try
         foreach($productVersions as $data)
         {
             echo "<td>\n";
-            foreach($data['oses'] as $osName => $osData)
+            foreach($data['oses'] as $osName => $osVersionData)
             {
                 $osVersionDetail = "";
-                foreach($osData['versions'] as $osVersion => $osVersionCount)
+                foreach($osVersionData['versions'] as $osVersion => $osVersionCount)
                 {
-                    $osVersionPercentage = round(($osVersionCount * 100) / $osData['count']);
+                    $osVersionPercentage = round(($osVersionCount * 100) / $osVersionData['count']);
 
                     if($osVersionPercentage === 0.0)
                         $osVersionPercentage = '<1';
@@ -545,7 +545,7 @@ try
                     $osVersionDetail .= "$osVersion ($osVersionPercentage%)";
                 }
 
-                $osPercentage = round(($osData['count'] * 100) / $data['count']);
+                $osPercentage = round(($osVersionData['count'] * 100) / $data['count']);
                 echo "<div data-toggle='tooltip' title='$osVersionDetail'>$osName ($osPercentage%)</div>\n";
             }
             echo "</td>\n";
