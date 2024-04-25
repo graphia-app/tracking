@@ -473,10 +473,15 @@ try
             if(!array_key_exists('oses', $productVersion))
                 $productVersion['oses'] = array();
 
-            if(!array_key_exists($osDetail[0], $productVersion['oses']))
-                $productVersion['oses'][$osDetail[0]] = array();
+            if($osDetail[0] === 'linux')
+                $osKey = 0;
+            else
+                $osKey = 2;
 
-            $os = &$productVersion['oses'][$osDetail[0]];
+            if(!array_key_exists($osDetail[$osKey], $productVersion['oses']))
+                $productVersion['oses'][$osDetail[$osKey]] = array();
+
+            $os = &$productVersion['oses'][$osDetail[$osKey]];
             incrementArrayByIndex($os, 'count');
 
             $versionString = $osDetail[3];
